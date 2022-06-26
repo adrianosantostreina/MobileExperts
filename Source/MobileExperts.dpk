@@ -1,6 +1,7 @@
 package MobileExperts;
 
 {$R *.res}
+{$R *.dres}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -28,6 +29,17 @@ package MobileExperts;
 {$IMPLICITBUILD ON}
 
 requires
-  rtl;
+  rtl,
+  designide;
+
+contains
+  MX.HelloWorld.Wizard in 'HelloWorld\MX.HelloWorld.Wizard.pas',
+  MX.MainMenu.Wizard in 'MainMenus\MX.MainMenu.Wizard.pas',
+  MX.Register in 'MX.Register.pas',
+  MX.Splash in 'Splash\MX.Splash.pas',
+  MX.NewProject.Wizard in 'NewProject\MX.NewProject.Wizard.pas',
+  MX.NewProject.Form in 'NewProject\MX.NewProject.Form.pas' {FrmNewProject},
+  MX.CreateIconsForApplication.Wizard in 'CreateIconsForApplication\MX.CreateIconsForApplication.Wizard.pas',
+  MX.CreateIconsForApplication.Form in 'CreateIconsForApplication\MX.CreateIconsForApplication.Form.pas' {FrmCreateIconsForApplication};
 
 end.
