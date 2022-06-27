@@ -15,9 +15,8 @@ type
     procedure createMenu;
     function CreateSubMenu(AParent: TMenuItem; ACaption: string;
       AName: string; AOnClick: TNotifyEvent): TMenuItem;
-    procedure About(Sender: TObject);
-
     procedure OnClickCreateIconsForApplication(Sender: TObject);
+    procedure OnClickAbout(Sender: TObject);
   protected
     function GetIDString: string;
     function GetName: string;
@@ -34,7 +33,8 @@ procedure RegisterMainMenuWizard;
 implementation
 
 uses
-  MX.CreateIconsForApplication.Form;
+  MX.CreateIconsForApplication.Form,
+  MX.About.Form;
 
 procedure RegisterMainMenuWizard;
 begin
@@ -42,11 +42,6 @@ begin
 end;
 
 { TMXMainMenuWizard }
-
-procedure TMXMainMenuWizard.About(Sender: TObject);
-begin
-  ShowMessage('Mobile Experts was created by Adriano Santos - Brazilian MVP');
-end;
 
 constructor TMXMainMenuWizard.Create;
 begin
@@ -75,7 +70,7 @@ begin
   CreateSubMenu(itemMobileExperts, 'Create Icons for Mobile Project...', 'imCreateIcons', OnClickCreateIconsForApplication);
   CreateSubMenu(itemMobileExperts, 'Update Project to This Delphi...', 'imUpdateProject', nil);
   CreateSubMenu(itemMobileExperts, '-', 'imDiv10', nil);
-  CreateSubMenu(itemMobileExperts, 'About Mobile Experts', 'imAbout', About);
+  CreateSubMenu(itemMobileExperts, 'About Mobile Experts', 'imAbout', OnClickAbout);
 end;
 
 function TMXMainMenuWizard.CreateSubMenu(AParent: TMenuItem; ACaption,
@@ -107,6 +102,19 @@ end;
 function TMXMainMenuWizard.GetState: TWizardState;
 begin
   Result := [wsEnabled];
+end;
+
+procedure TMXMainMenuWizard.OnClickAbout(Sender: TObject);
+var
+  FrmAbout : TFrmAbout;
+begin
+  FrmAbout := TFrmAbout.Create(nil);
+  try
+    FrmAbout.ShowModal;
+  finally
+    FrmAbout.Free;
+  end;
+
 end;
 
 procedure TMXMainMenuWizard.OnClickCreateIconsForApplication(Sender: TObject);

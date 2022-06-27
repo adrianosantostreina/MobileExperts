@@ -173,13 +173,13 @@ end;
 function TMXCreateIconsForApplicationContextMenuItemMenu.PostExecute(
   const MenuContextList: IInterfaceList): Boolean;
 begin
-
+  //
 end;
 
 function TMXCreateIconsForApplicationContextMenuItemMenu.PreExecute(
   const MenuContextList: IInterfaceList): Boolean;
 begin
-
+  //
 end;
 
 procedure TMXCreateIconsForApplicationContextMenuItemMenu.SetCaption(
