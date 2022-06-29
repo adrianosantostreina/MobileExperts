@@ -1,9 +1,10 @@
-unit MX.About.Form;
+unit MX.Template.Form;
 
 interface
 
 uses
   ToolsApi,
+
   System.Classes,
   System.SysUtils,
   System.Variants,
@@ -12,20 +13,12 @@ uses
   Vcl.Dialogs,
   Vcl.Forms,
   Vcl.Graphics,
-  Vcl.StdCtrls,
 
   Winapi.Messages,
-  Winapi.Windows,
-
-  MX.Template.Form;
+  Winapi.Windows;
 
 type
-  TFrmAbout = class(TFrmTemplate)
-    Label1: TLabel;
-    Label2: TLabel;
-    Label3: TLabel;
-    Label4: TLabel;
-    Label5: TLabel;
+  TFrmTemplate = class(TForm)
     procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
@@ -34,17 +27,16 @@ type
   end;
 
 var
-  FrmAbout: TFrmAbout;
+  FrmTemplate: TFrmTemplate;
 
 implementation
 
 {$R *.dfm}
 
-procedure TFrmAbout.FormCreate(Sender: TObject);
+procedure TFrmTemplate.FormCreate(Sender: TObject);
 begin
-  inherited;
   {$IF CompilerVersion >= 32.0}
-    (BorlandIDEServices as IOTAIDEThemingServices).RegisterFormClass(TFrmAbout);
+    (BorlandIDEServices as IOTAIDEThemingServices).RegisterFormClass(TFrmTemplate);
     (BorlandIDEServices as IOTAIDEThemingServices).ApplyTheme(Self);
   {$ENDIF}
 end;

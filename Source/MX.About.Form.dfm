@@ -13,7 +13,7 @@ object FrmAbout: TFrmAbout
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poScreenCenter
-  OnShow = FormShow
+  OnCreate = FormCreate
   TextHeight = 15
   object Label1: TLabel
     Left = 0
@@ -64,9 +64,23 @@ object FrmAbout: TFrmAbout
   object Label4: TLabel
     Left = 8
     Top = 152
-    Width = 161
+    Width = 58
     Height = 21
-    Caption = 'Author: Adriano Santos'
+    Caption = 'Author: '
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Segoe UI'
+    Font.Style = [fsBold]
+    ParentFont = False
+    WordWrap = True
+  end
+  object Label5: TLabel
+    Left = 69
+    Top = 152
+    Width = 106
+    Height = 21
+    Caption = 'Adriano Santos'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -16

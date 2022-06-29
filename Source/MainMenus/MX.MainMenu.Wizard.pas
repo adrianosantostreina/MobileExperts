@@ -6,6 +6,8 @@ uses
   ToolsApi,
   System.SysConst,
   System.Classes,
+  System.StrUtils,
+  System.SysUtils,
   Vcl.Dialogs,
   Vcl.Menus;
 
@@ -13,8 +15,7 @@ type
   TMXMainMenuWizard = class(TNotifierObject, IOTAWizard)
   private
     procedure createMenu;
-    function CreateSubMenu(AParent: TMenuItem; ACaption: string;
-      AName: string; AOnClick: TNotifyEvent): TMenuItem;
+    function CreateSubMenu(AParent: TMenuItem; ACaption: string; AName: string; AOnClick: TNotifyEvent; AEnable : Boolean = True): TMenuItem;
     procedure OnClickCreateIconsForApplication(Sender: TObject);
     procedure OnClickAbout(Sender: TObject);
   protected
@@ -50,9 +51,9 @@ end;
 
 procedure TMXMainMenuWizard.createMenu;
 var
-  LMainMenuDelphi:   TMainMenu;
-  LMenuName:         string;
-  itemMobileExperts: TMenuItem;
+  LMainMenuDelphi                : TMainMenu;
+  LMenuName                      : string;
+  itemMobileExperts              : TMenuItem;
 begin
   LMainMenuDelphi := (BorlandIDEServices as INTAServices).MainMenu;
   LMenuName       := 'imMobileExperts';
@@ -66,19 +67,40 @@ begin
 
   LMainMenuDelphi.Items.Add(itemMobileExperts);
 
-
-  CreateSubMenu(itemMobileExperts, 'Create Icons for Mobile Project...', 'imCreateIcons', OnClickCreateIconsForApplication);
-  CreateSubMenu(itemMobileExperts, 'Update Project to This Delphi...', 'imUpdateProject', nil);
-  CreateSubMenu(itemMobileExperts, '-', 'imDiv10', nil);
-  CreateSubMenu(itemMobileExperts, 'About Mobile Experts', 'imAbout', OnClickAbout);
+  CreateSubMenu(
+    itemMobileExperts,
+    'Create Icons for this Application...',
+    'imCreateIconsToProject',
+    OnClickCreateIconsForApplication,
+    True
+  );
+  CreateSubMenu(
+    itemMobileExperts,
+    'Update Project to This Delphi...',
+    'imUpdateProject',
+    nil
+  );
+  CreateSubMenu(
+    itemMobileExperts,
+    '-',
+    'imDiv10',
+    nil
+  );
+  CreateSubMenu(
+    itemMobileExperts,
+    'About Mobile Experts',
+    'imAbout',
+    OnClickAbout
+  );
 end;
 
 function TMXMainMenuWizard.CreateSubMenu(AParent: TMenuItem; ACaption,
-  AName: string; AOnClick: TNotifyEvent): TMenuItem;
+  AName: string; AOnClick: TNotifyEvent; AEnable : Boolean = True): TMenuItem;
 begin
   Result         := TMenuItem.Create(AParent);
   Result.Caption := ACaption;
   Result.Name    := AName;
+  Result.Enabled := AEnable;
   Result.OnClick := AOnClick;
 
   AParent.Add(Result);

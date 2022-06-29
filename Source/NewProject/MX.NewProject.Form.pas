@@ -17,15 +17,17 @@ uses
   Vcl.StdCtrls,
 
   Winapi.Messages,
-  Winapi.Windows;
+  Winapi.Windows,
+
+  MX.Template.Form;
 
 type
-  TFrmNewProject = class(TForm)
+  TFrmNewProject = class(TFrmTemplate)
     Panel1: TPanel;
     Image1: TImage;
     btnClose: TButton;
     procedure btnCloseClick(Sender: TObject);
-    procedure FormShow(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
   public
@@ -41,17 +43,13 @@ begin
   Close;
 end;
 
-procedure TFrmNewProject.FormShow(Sender: TObject);
-var
-  I : Integer;
+procedure TFrmNewProject.FormCreate(Sender: TObject);
 begin
+  inherited;
   {$IF CompilerVersion >= 32.0}
-    (BorlandIDEServices as IOTAIDEThemingServices260).RegisterFormClass(TFrmNewProject);
-    for I := 0 to Pred(ComponentCount) do
-    begin
-      (BorlandIDEServices as IOTAIDEThemingServices260).ApplyTheme(Components[I]);
-    end;
-  {$EndIF}
+    (BorlandIDEServices as IOTAIDEThemingServices).RegisterFormClass(TFrmNewProject);
+    (BorlandIDEServices as IOTAIDEThemingServices).ApplyTheme(Self);
+  {$ENDIF}
 end;
 
 end.

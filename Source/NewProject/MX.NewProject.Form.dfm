@@ -11,7 +11,7 @@ object FrmNewProject: TFrmNewProject
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poScreenCenter
-  OnShow = FormShow
+  OnCreate = FormCreate
   TextHeight = 15
   object Panel1: TPanel
     Left = 0

@@ -4,12 +4,16 @@ interface
 
 uses
   ToolsApi,
-  System.SysUtils,
+
   System.Classes,
+  System.SysUtils,
+  System.StrUtils,
+
   Vcl.Dialogs;
 
 type
-  TMXCreateIconsForApplicationContextMenu = class(TNotifierObject, IOTAProjectMenuItemCreatorNotifier)
+  TMXCreateIconsForApplicationContextMenu = class(TNotifierObject,
+    IOTAProjectMenuItemCreatorNotifier)
   protected
     procedure AddMenu(const Project: IOTAProject; const IdentList: TStrings;
       const ProjectManagerMenuList: IInterfaceList; IsMultiSelect: Boolean);
@@ -17,7 +21,8 @@ type
     class function New: IOTAProjectMenuItemCreatorNotifier;
   end;
 
-  TMXCreateIconsForApplicationContextMenuItemMenu = class(TNotifierObject, IOTALocalMenu, IOTAProjectManagerMenu)
+  TMXCreateIconsForApplicationContextMenuItemMenu = class(TNotifierObject, IOTALocalMenu,
+    IOTAProjectManagerMenu)
     protected
       { Returns the Caption to be used for this menu item }
       function GetCaption: string;
@@ -93,11 +98,14 @@ end;
 procedure TMXCreateIconsForApplicationContextMenu.AddMenu(const Project: IOTAProject;
   const IdentList: TStrings; const ProjectManagerMenuList: IInterfaceList;
   IsMultiSelect: Boolean);
+var
+  LIOTAMenu: IOTAProjectManagerMenu;
 begin
   if (IdentList.IndexOf(sProjectContainer)) < 0 then
     exit;
 
-  ProjectManagerMenuList.Add(TMXCreateIconsForApplicationContextMenuItemMenu.New);
+  LIOTAMenu := TMXCreateIconsForApplicationContextMenuItemMenu.New;
+  ProjectManagerMenuList.Add(LIOTAMenu);
 end;
 
 class function TMXCreateIconsForApplicationContextMenu.New: IOTAProjectMenuItemCreatorNotifier;
@@ -110,14 +118,34 @@ end;
 procedure TMXCreateIconsForApplicationContextMenuItemMenu.Execute(
   const MenuContextList: IInterfaceList);
 var
+  MenuContext : IOTAProjectMenuContext;
+  Project : IOTAProject;
   FrmCreateIconsForApplication : TFrmCreateIconsForApplication;
 begin
-  FrmCreateIconsForApplication := TFrmCreateIconsForApplication.Create(nil);
-  try
-    FrmCreateIconsForApplication.ShowModal;
-  finally
-    FrmCreateIconsForApplication.Free;
+  MenuContext := MenuContextList.Items[0] as IOTAProjectMenuContext;
+  Project := MenuContext.Project;
+
+  if ((UpperCase(Project.ApplicationType).Equals('APPLICATION')) or
+      (UpperCase(Project.ApplicationType).Equals('CONSOLE')) or
+      (UpperCase(Project.ApplicationType).Equals('LIBRARY'))
+     )
+  then
+  begin
+    FrmCreateIconsForApplication := TFrmCreateIconsForApplication.Create(nil);
+    try
+      FrmCreateIconsForApplication.FileName(Project.FileName);
+      FrmCreateIconsForApplication.ShowModal;
+    finally
+      FrmCreateIconsForApplication.Free;
+    end;
+  end
+  else
+  begin
+    MessageDlg('This type of project does not allow customizing icons.',
+      TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
+    exit;
   end;
+
 end;
 
 function TMXCreateIconsForApplicationContextMenuItemMenu.GetCaption: string;
@@ -197,7 +225,7 @@ end;
 procedure TMXCreateIconsForApplicationContextMenuItemMenu.SetEnabled(
   Value: Boolean);
 begin
-
+  //
 end;
 
 procedure TMXCreateIconsForApplicationContextMenuItemMenu.SetHelpContext(
