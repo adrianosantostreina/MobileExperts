@@ -3,8 +3,8 @@ object FrmCreateIconsForApplication: TFrmCreateIconsForApplication
   Top = 0
   BorderStyle = bsToolWindow
   Caption = 'Create Icons for Application'
-  ClientHeight = 658
-  ClientWidth = 926
+  ClientHeight = 471
+  ClientWidth = 856
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,36 +18,171 @@ object FrmCreateIconsForApplication: TFrmCreateIconsForApplication
   object pnlTools: TPanel
     Left = 0
     Top = 0
-    Width = 926
-    Height = 74
+    Width = 856
+    Height = 89
     Align = alTop
     TabOrder = 0
-    object pnlTop: TPanel
-      Left = 1
-      Top = 1
-      Width = 924
-      Height = 71
+    object lblCurrentProject: TLabel
+      Left = 5
+      Top = 8
+      Width = 69
+      Height = 17
+      Margins.Left = 2
+      Margins.Top = 2
+      Margins.Right = 2
+      Caption = 'Project Path'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+    end
+    object Bevel1: TBevel
+      Left = 614
+      Top = 8
+      Width = 237
+      Height = 72
+      Shape = bsFrame
+    end
+    object chkBackup: TCheckBox
+      Left = 5
+      Top = 63
+      Width = 242
+      Height = 17
+      Caption = 'Create backup before apply (.dproj)'
+      Checked = True
+      State = cbChecked
+      TabOrder = 0
+    end
+    object edtProjectFilePath: TEdit
+      Left = 5
+      Top = 32
+      Width = 603
+      Height = 25
+      ReadOnly = True
+      TabOrder = 1
+    end
+    object btnProcessProjectIcon: TButton
+      Left = 622
+      Top = 16
+      Width = 219
+      Height = 57
       Margins.Left = 2
       Margins.Top = 2
       Margins.Right = 2
       Margins.Bottom = 2
-      Align = alTop
+      Caption = 'Update Project'
+      TabOrder = 2
+      OnClick = btnProcessProjectIconClick
+    end
+  end
+  object pnlLeft: TPanel
+    Left = 0
+    Top = 89
+    Width = 609
+    Height = 355
+    Align = alLeft
+    TabOrder = 1
+    object pnlAppIcon: TPanel
+      Left = 1
+      Top = 1
+      Width = 607
+      Height = 353
+      Margins.Left = 2
+      Margins.Top = 2
+      Margins.Right = 2
+      Margins.Bottom = 2
+      Align = alClient
       TabOrder = 0
-      ExplicitTop = -30
-      ExplicitWidth = 183
-      DesignSize = (
-        924
-        71)
-      object lblCurrentProject: TLabel
+      object lblAppIconHint: TLabel
         Left = 8
         Top = 8
-        Width = 56
+        Width = 64
         Height = 17
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
-        Alignment = taRightJustify
-        Caption = 'Filename'
+        Caption = 'Icon Image'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ParentFont = False
+      end
+      object lblAppLaunchImageHint: TLabel
+        Left = 208
+        Top = 8
+        Width = 80
+        Height = 17
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Caption = 'Launch Image'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ParentFont = False
+      end
+      object SpeedButton1: TSpeedButton
+        Left = 155
+        Top = 9
+        Width = 23
+        Height = 22
+        ImageIndex = 0
+        Images = imgList
+        Flat = True
+        OnClick = SpeedButton1Click
+      end
+      object SpeedButton2: TSpeedButton
+        Left = 355
+        Top = 9
+        Width = 23
+        Height = 22
+        ImageIndex = 0
+        Images = imgList
+        Flat = True
+        OnClick = SpeedButton2Click
+      end
+      object lblLaunchImageBackColorHint: TLabel
+        Left = 406
+        Top = 12
+        Width = 105
+        Height = 17
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Caption = 'Background Color'
+      end
+      object lblBackColorHexCodeHint: TLabel
+        Left = 406
+        Top = 158
+        Width = 46
+        Height = 17
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Caption = 'or Hexa'
+      end
+      object lblLaunchImageScaleBaseHeightHint: TLabel
+        Left = 493
+        Top = 158
+        Width = 30
+        Height = 17
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Caption = 'Scale'
+      end
+      object Label1: TLabel
+        Left = 283
+        Top = 271
+        Width = 36
+        Height = 17
+        Caption = '- OR -'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -13
@@ -55,100 +190,24 @@ object FrmCreateIconsForApplication: TFrmCreateIconsForApplication
         Font.Style = [fsBold]
         ParentFont = False
       end
-      object btnSelectProject: TButton
-        Left = 693
-        Top = 28
-        Width = 222
-        Height = 28
-        Margins.Left = 2
-        Margins.Top = 2
-        Margins.Right = 2
-        Margins.Bottom = 2
-        Anchors = [akTop, akRight]
-        Caption = 'Selecione o arquivo do projeto'
-        TabOrder = 0
-        OnClick = btnSelectProjectClick
-        ExplicitLeft = 792
-      end
-      object edtProjectFilePath: TComboBox
-        Left = 8
-        Top = 30
-        Width = 658
-        Height = 25
-        Margins.Left = 2
-        Margins.Top = 2
-        Margins.Right = 2
-        Margins.Bottom = 2
-        Anchors = [akLeft, akTop, akRight]
-        TabOrder = 1
-        ExplicitWidth = 757
-      end
-    end
-  end
-  object pnlLeft: TPanel
-    Left = 0
-    Top = 74
-    Width = 665
-    Height = 584
-    Align = alLeft
-    TabOrder = 1
-    ExplicitTop = 131
-    ExplicitHeight = 639
-    object pnlAppIcon: TPanel
-      Left = 1
-      Top = 1
-      Width = 663
-      Height = 158
-      Margins.Left = 2
-      Margins.Top = 2
-      Margins.Right = 2
-      Margins.Bottom = 2
-      Align = alTop
-      TabOrder = 0
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 1023
-      object lblAppIconHint: TLabel
-        Left = 8
-        Top = 8
-        Width = 93
-        Height = 17
-        Margins.Left = 2
-        Margins.Top = 2
-        Margins.Right = 2
-        Caption = 'Application Icon'
-      end
       object btnSelectProjectIcon: TButton
-        Left = 129
-        Top = 30
-        Width = 213
+        Left = 8
+        Top = 206
+        Width = 186
         Height = 28
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
         Margins.Bottom = 2
-        Caption = 'Select Icon File'
+        Caption = 'Icon Image'
         TabOrder = 0
         OnClick = btnSelectProjectIconClick
       end
-      object btnProcessProjectIcon: TButton
-        Left = 129
-        Top = 94
-        Width = 211
-        Height = 28
-        Margins.Left = 2
-        Margins.Top = 2
-        Margins.Right = 2
-        Margins.Bottom = 2
-        Caption = 'Set icons to Selected Project'
-        TabOrder = 1
-        OnClick = btnProcessProjectIconClick
-      end
-      object Panel9: TPanel
+      object pnlIconImage: TPanel
         Left = 8
         Top = 32
-        Width = 115
-        Height = 116
+        Width = 185
+        Height = 170
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -157,12 +216,12 @@ object FrmCreateIconsForApplication: TFrmCreateIconsForApplication
         BorderStyle = bsSingle
         Color = clWhite
         ParentBackground = False
-        TabOrder = 2
+        TabOrder = 1
         object imgProjectIcon: TImage
           Left = 2
           Top = 2
-          Width = 107
-          Height = 108
+          Width = 177
+          Height = 162
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -170,118 +229,27 @@ object FrmCreateIconsForApplication: TFrmCreateIconsForApplication
           Align = alClient
           Stretch = True
           ExplicitWidth = 108
+          ExplicitHeight = 108
         end
       end
       object btnGenerateProjectIconEverySize: TButton
-        Left = 129
-        Top = 61
-        Width = 213
+        Left = 8
+        Top = 238
+        Width = 186
         Height = 28
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
         Margins.Bottom = 2
         Caption = 'Generate Files'
-        TabOrder = 3
+        TabOrder = 2
         OnClick = btnGenerateProjectIconEverySizeClick
       end
-      object edtIconCornerSizePercent: TEdit
-        Left = 350
-        Top = 31
-        Width = 78
-        Height = 25
-        Margins.Left = 2
-        Margins.Top = 2
-        Margins.Right = 2
-        Margins.Bottom = 2
-        TabOrder = 4
-        Text = '0'
-      end
-    end
-    object pnlAppLaunch: TPanel
-      Left = 1
-      Top = 159
-      Width = 663
-      Height = 424
-      Margins.Left = 2
-      Margins.Top = 2
-      Margins.Right = 2
-      Margins.Bottom = 2
-      Align = alClient
-      TabOrder = 1
-      ExplicitTop = 163
-      ExplicitHeight = 479
-      object lblAppLaunchImageHint: TLabel
-        Left = 8
-        Top = 8
-        Width = 78
-        Height = 17
-        Margins.Left = 2
-        Margins.Top = 2
-        Margins.Right = 2
-        Caption = 'Splash Image'
-      end
-      object lblLaunchImageBackColorHint: TLabel
-        Left = 140
-        Top = 64
-        Width = 273
-        Height = 17
-        Margins.Left = 2
-        Margins.Top = 2
-        Margins.Right = 2
-        Caption = 'Escolha uma cor de fundo para a composi'#231#227'o:'
-      end
-      object lblLaunchImageScaleBaseHeightHint: TLabel
-        Left = 336
-        Top = 83
-        Width = 208
-        Height = 17
-        Margins.Left = 2
-        Margins.Top = 2
-        Margins.Right = 2
-        Caption = 'A altura base da imagem ampliada:'
-      end
-      object lblBackColorHexCodeHint: TLabel
-        Left = 336
-        Top = 142
-        Width = 238
-        Height = 17
-        Margins.Left = 2
-        Margins.Top = 2
-        Margins.Right = 2
-        Caption = 'ou c'#243'digo hexadecimal da cor de fundo:'
-      end
-      object cmbProjectLaunchBackColor: TColorListBox
-        Left = 140
-        Top = 84
-        Width = 189
-        Height = 102
-        Margins.Left = 2
-        Margins.Top = 2
-        Margins.Right = 2
-        Margins.Bottom = 2
-        NoneColorColor = clWhite
-        Selected = clWhite
-        ItemHeight = 13
-        TabOrder = 0
-        OnClick = cmbProjectLaunchBackColorClick
-      end
-      object edtProjectLaunchBackColor: TEdit
-        Left = 336
-        Top = 161
-        Width = 92
-        Height = 25
-        Margins.Left = 2
-        Margins.Top = 2
-        Margins.Right = 2
-        Margins.Bottom = 2
-        TabOrder = 1
-      end
-      object Panel12: TPanel
-        Left = 8
+      object pnlLauchImage: TPanel
+        Left = 208
         Top = 32
-        Width = 128
-        Height = 192
+        Width = 185
+        Height = 170
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
@@ -290,12 +258,12 @@ object FrmCreateIconsForApplication: TFrmCreateIconsForApplication
         BorderStyle = bsSingle
         Color = clWhite
         ParentBackground = False
-        TabOrder = 2
+        TabOrder = 3
         object imgProjectLaunchImage: TImage
           Left = 2
           Top = 2
-          Width = 120
-          Height = 184
+          Width = 177
+          Height = 162
           Margins.Left = 2
           Margins.Top = 2
           Margins.Right = 2
@@ -307,64 +275,48 @@ object FrmCreateIconsForApplication: TFrmCreateIconsForApplication
         end
       end
       object btnSelectProjectLaunchImage: TButton
-        Left = 140
-        Top = 32
-        Width = 213
+        Left = 208
+        Top = 206
+        Width = 186
         Height = 28
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
         Margins.Bottom = 2
-        Caption = 'Selecicone o arquivo'
-        TabOrder = 3
+        Caption = 'Lauch Image'
+        TabOrder = 4
         OnClick = btnSelectProjectLaunchImageClick
       end
-      object btnGenerateProjectLaunchImageEverySize: TButton
-        Left = 140
-        Top = 196
-        Width = 237
-        Height = 77
+      object cmbProjectLaunchBackColor: TColorListBox
+        Left = 406
+        Top = 32
+        Width = 189
+        Height = 122
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
         Margins.Bottom = 2
-        Caption = 'Gere v'#225'rios tamanhos diretamente no cat'#225'logo do projeto'
-        TabOrder = 4
-        WordWrap = True
-        OnClick = btnGenerateProjectLaunchImageEverySizeClick
-      end
-      object btnProcessProjectLaunchImage: TButton
-        Left = 140
-        Top = 277
-        Width = 237
-        Height = 77
-        Margins.Left = 2
-        Margins.Top = 2
-        Margins.Right = 2
-        Margins.Bottom = 2
-        Caption = 'Definir como a imagem de inicializa'#231#227'o do projeto'
+        NoneColorColor = clWhite
+        Selected = clWhite
+        ItemHeight = 13
         TabOrder = 5
-        WordWrap = True
-        OnClick = btnProcessProjectLaunchImageClick
+        OnClick = cmbProjectLaunchBackColorClick
       end
-      object btnCombineLaunchImageByBackColor: TButton
-        Left = 381
-        Top = 196
-        Width = 237
-        Height = 77
+      object edtProjectLaunchBackColor: TEdit
+        Left = 406
+        Top = 177
+        Width = 83
+        Height = 25
         Margins.Left = 2
         Margins.Top = 2
         Margins.Right = 2
         Margins.Bottom = 2
-        Caption = 'Ou sintetize a imagem de inicializa'#231#227'o com base na cor de fundo'
         TabOrder = 6
-        WordWrap = True
-        OnClick = btnCombineLaunchImageByBackColorClick
       end
       object edtScaleBaseHeight: TEdit
-        Left = 336
-        Top = 107
-        Width = 79
+        Left = 493
+        Top = 177
+        Width = 102
         Height = 25
         Margins.Left = 2
         Margins.Top = 2
@@ -373,19 +325,116 @@ object FrmCreateIconsForApplication: TFrmCreateIconsForApplication
         TabOrder = 7
         Text = '960'
       end
+      object btnGenerateProjectLaunchImageEverySize: TButton
+        Left = 208
+        Top = 238
+        Width = 186
+        Height = 28
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
+        Caption = 'Genarate Files'
+        TabOrder = 8
+        WordWrap = True
+        OnClick = btnGenerateProjectLaunchImageEverySizeClick
+      end
+      object btnCombineLaunchImageByBackColor: TButton
+        Left = 208
+        Top = 290
+        Width = 186
+        Height = 48
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
+        Caption = 'Synthesize launch image based on Background Color'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Segoe UI'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 9
+        WordWrap = True
+        OnClick = btnCombineLaunchImageByBackColorClick
+      end
+      object btnProcessProjectLaunchImage: TButton
+        Left = 8
+        Top = 270
+        Width = 128
+        Height = 35
+        Margins.Left = 2
+        Margins.Top = 2
+        Margins.Right = 2
+        Margins.Bottom = 2
+        Caption = 'Definir como a imagem de inicializa'#231#227'o do projeto'
+        TabOrder = 10
+        Visible = False
+        WordWrap = True
+        OnClick = btnProcessProjectLaunchImageClick
+      end
     end
   end
-  object Panel1: TPanel
-    Left = 665
-    Top = 74
-    Width = 261
-    Height = 584
+  object pnlImages: TPanel
+    Left = 609
+    Top = 89
+    Width = 247
+    Height = 355
     Align = alClient
+    AutoSize = True
     TabOrder = 2
-    ExplicitLeft = 984
-    ExplicitTop = 256
-    ExplicitWidth = 185
-    ExplicitHeight = 41
+    object Label3: TLabel
+      AlignWithMargins = True
+      Left = 4
+      Top = 4
+      Width = 239
+      Height = 17
+      Align = alTop
+      Caption = 'Files on path (/images)'
+      ExplicitWidth = 133
+    end
+    object fileList: TFileListBox
+      AlignWithMargins = True
+      Left = 4
+      Top = 24
+      Width = 239
+      Height = 327
+      Align = alClient
+      IntegralHeight = True
+      ItemHeight = 17
+      Mask = '*.png'
+      ShowGlyphs = True
+      TabOrder = 0
+      StyleName = 'Windows'
+    end
+  end
+  object pnlAppLaunch: TPanel
+    Left = 0
+    Top = 444
+    Width = 856
+    Height = 27
+    Margins.Left = 2
+    Margins.Top = 2
+    Margins.Right = 2
+    Margins.Bottom = 2
+    Align = alBottom
+    Padding.Left = 4
+    Padding.Top = 4
+    Padding.Right = 4
+    Padding.Bottom = 4
+    TabOrder = 3
+    object Label2: TLabel
+      Left = 5
+      Top = 5
+      Width = 846
+      Height = 17
+      Align = alClient
+      Caption = 
+        'Part of the code was based on Orange. Thank you Orange Developer' +
+        's.'
+      ExplicitWidth = 414
+    end
   end
   object opdSelectProjectIcon: TOpenPictureDialog
     Left = 60
@@ -400,5 +449,148 @@ object FrmCreateIconsForApplication: TFrmCreateIconsForApplication
     Filter = 'Delphi'#24037#31243#25991#20214'(*.dproj)|*.dproj'
     Left = 60
     Top = 449
+  end
+  object imgList: TImageList
+    Left = 177
+    Top = 339
+    Bitmap = {
+      494C010101000800040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
+      0000000000003600000028000000400000001000000001002000000000000010
+      000000000000000000000000000000000000000000FF000000FF000000FF0000
+      00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
+      00FF000000FF000000FF000000FF000000FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000FF000000FF000000FF0000
+      00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
+      00FF000000FF000000FF000000FF000000FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000FF000000FFD4D4D4001F1F
+      1F00ACACAC00000000FF000000FF000000FF000000FF000000FF000000FFADAD
+      AD0020202000D4D4D400000000FF000000FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000FF000000FF232323000000
+      000004040400ADADAD00000000FF000000FF000000FF000000FFAEAEAE000404
+      04000000000023232300000000FF000000FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000FF000000FFB6B6B6000707
+      07000000000004040400AEAEAE00000000FF000000FFB4B4B400060606000000
+      000005050500B0B0B000000000FF000000FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000FF000000FF000000FFB6B6
+      B600070707000000000004040400AEAEAE00B5B5B50006060600000000000505
+      0500B0B0B000000000FF000000FF000000FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000FF000000FF000000FF0000
+      00FFB1B1B100050505000000000005050500050505000000000005050500B1B1
+      B100000000FF000000FF000000FF000000FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000FF000000FF000000FF0000
+      00FF000000FFB5B5B50006060600000000000000000005050500AFAFAF000000
+      00FF000000FF000000FF000000FF000000FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000FF000000FF000000FF0000
+      00FF000000FFB7B7B70007070700000000000000000006060600B1B1B1000000
+      00FF000000FF000000FF000000FF000000FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000FF000000FF000000FF0000
+      00FFB3B3B300060606000000000003030300030303000000000007070700B4B4
+      B400000000FF000000FF000000FF000000FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000FF000000FF000000FFB5B5
+      B500070707000000000002020200A4A4A400AAAAAA0004040400000000000505
+      0500AFAFAF00000000FF000000FF000000FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000FF000000FFB3B3B3000606
+      06000000000004040400ACACAC00000000FF000000FFABABAB00040404000000
+      000005050500AEAEAE00000000FF000000FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000FF000000FF222222000000
+      000005050500AFAFAF00000000FF000000FF000000FF000000FFAEAEAE000505
+      05000000000022222200000000FF000000FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000FF000000FFD4D4D4002323
+      2300B1B1B100000000FF000000FF000000FF000000FF000000FF000000FFB0B0
+      B00023232300D5D5D500000000FF000000FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000FF000000FF000000FF0000
+      00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
+      00FF000000FF000000FF000000FF000000FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000000000FF000000FF000000FF0000
+      00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
+      00FF000000FF000000FF000000FF000000FF0000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000424D3E000000000000003E000000
+      2800000040000000100000000100010000000000800000000000000000000000
+      000000000000000000000000FFFFFF00FFFF000000000000FFFF000000000000
+      C7E3000000000000C3C3000000000000C183000000000000E007000000000000
+      F00F000000000000F81F000000000000F81F000000000000F00F000000000000
+      E007000000000000C183000000000000C3C3000000000000C7E3000000000000
+      FFFF000000000000FFFF00000000000000000000000000000000000000000000
+      000000000000}
   end
 end

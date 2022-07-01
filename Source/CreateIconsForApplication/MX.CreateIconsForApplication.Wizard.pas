@@ -118,22 +118,23 @@ end;
 procedure TMXCreateIconsForApplicationContextMenuItemMenu.Execute(
   const MenuContextList: IInterfaceList);
 var
-  MenuContext : IOTAProjectMenuContext;
-  Project : IOTAProject;
+  MenuContext                  : IOTAProjectMenuContext;
+  LProject                     : IOTAProject;
   FrmCreateIconsForApplication : TFrmCreateIconsForApplication;
 begin
   MenuContext := MenuContextList.Items[0] as IOTAProjectMenuContext;
-  Project := MenuContext.Project;
+  LProject := MenuContext.Project;
 
-  if ((UpperCase(Project.ApplicationType).Equals('APPLICATION')) or
-      (UpperCase(Project.ApplicationType).Equals('CONSOLE')) or
-      (UpperCase(Project.ApplicationType).Equals('LIBRARY'))
+  if ((UpperCase(LProject.ApplicationType).Equals('APPLICATION')) or
+      (UpperCase(LProject.ApplicationType).Equals('CONSOLE')) or
+      (UpperCase(LProject.ApplicationType).Equals('LIBRARY'))
      )
   then
   begin
     FrmCreateIconsForApplication := TFrmCreateIconsForApplication.Create(nil);
     try
-      FrmCreateIconsForApplication.FileName(Project.FileName);
+      FrmCreateIconsForApplication.FileName(LProject.FileName);
+      FrmCreateIconsForApplication.Project := LProject;
       FrmCreateIconsForApplication.ShowModal;
     finally
       FrmCreateIconsForApplication.Free;
@@ -145,7 +146,6 @@ begin
       TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
     exit;
   end;
-
 end;
 
 function TMXCreateIconsForApplicationContextMenuItemMenu.GetCaption: string;

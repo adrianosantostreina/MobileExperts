@@ -4,12 +4,13 @@ interface
 
 uses
   {$IFDEF MSWINDOWS}
-  ShlwApi,
-  ShellAPI,
-  ActiveX,
-  Winapi.Windows,
-  System.Win.Registry,
+    ShlwApi,
+    ShellAPI,
+    ActiveX,
+    Winapi.Windows,
+    System.Win.Registry,
   {$ENDIF MSWINDOWS}
+
   System.SysUtils,
   System.Variants,
   XMLDoc,
@@ -20,7 +21,6 @@ uses
   uFuncCommon_Copy,
   IniFiles,
   Math,
-  // MD5,
   StrUtils,
   FMX.Forms,
   FMX.Dialogs,
@@ -33,8 +33,7 @@ const
   Const_OrangeSDKConfig_FileExt = '.OrangeSDKConfig';
 
 type
-  TDeployConfigLogEvent = procedure(Sender: TObject; const ALog: String)
-    of object;
+  TDeployConfigLogEvent = procedure(Sender: TObject; const ALog: String) of object;
 
   TDeployFilePlatform = class
     public
@@ -188,20 +187,11 @@ type
         AProjectFilePath: String): Boolean;
 
       function SaveProjectIconToProject(AProjectFilePath: String): Boolean;
-
-      function SaveProjectPictureToProjectXMLNode(AIconWidth: Integer;
-        AIconHeight: Integer;
-        ANodeName: String;
-        AXMLNode: IXMLNode;
-        AText: String = ''): Boolean;
-
-      function SaveProjectLaunchImageToProject(AProjectFilePath
-        : String): Boolean;
-
+      function SaveProjectPictureToProjectXMLNode(AIconWidth: Integer; AIconHeight: Integer; ANodeName: String; AXMLNode: IXMLNode; AText: String = ''): Boolean;
+      function SaveProjectLaunchImageToProject(AProjectFilePath: String): Boolean;
       procedure CheckInfoPlistTemplateiOSXmlFile(AProjectFilePath: String);
 
       procedure CheckEntitlementTemplateiOSXmlFile(AProjectFilePath: String);
-
       function SaveIOSInfoPlistToProject(AProjectFilePath: String;
         AInfoPlistRootNodes: TStringList;
         AConfigVariables: TConfigVariableList
@@ -260,10 +250,8 @@ var
   GlobalIOSDylibList:              TStringList;
   OnDeployConfigLog:               TDeployConfigLogEvent;
 
-function ConvertRelativePathToAbsolutePath(ABaseDirPath: String;
-  ARelativePath: String): String;
-function ConvertAbsolutePathToRelativePath(ABaseDirPath: String;
-  AAbsolutePath: String): String;
+function ConvertRelativePathToAbsolutePath(ABaseDirPath: String; ARelativePath: String): String;
+function ConvertAbsolutePathToRelativePath(ABaseDirPath: String; AAbsolutePath: String): String;
 procedure ReplaceStringList(AFrom: String; ATo: String; AStringList: TStrings);
 
 function GenerateJarBatStringList(ATempJarDirPath: String;
@@ -5119,61 +5107,70 @@ end;
 
 function TProjectConfig.SaveProjectIconToProject(AProjectFilePath : String): Boolean;
 var
-  AXMLNode:      IXMLNode;
-  AXMLChildNode: IXMLNode;
-  AXMLDocument:  TXMLDocument;
-  I:             Integer;
-  AIsModified:   Boolean;
+  AXMLNode      : IXMLNode;
+  AXMLChildNode : IXMLNode;
+  AXMLDocument  : TXMLDocument;
+  I             : Integer;
+  AIsModified   : Boolean;
 begin
   Result := False;
 
-  if (AProjectFilePath = '') then
+  if (AProjectFilePath.Equals(EmptyStr)) then
   begin
-    DoDeployConfigLog(nil, 'Please select project file');
+    DoDeployConfigLog(nil, 'Please select a Project File');
     Exit;
   end;
 
-  if Not FileExists(AProjectFilePath) then
+//  if (AProjectFilePath = '') then
+//  begin
+//    DoDeployConfigLog(nil, 'Please select project file');
+//    Exit;
+//  end;
+
+  if not FileExists(AProjectFilePath) then
   begin
-    DoDeployConfigLog(nil, 'Project file is not exist');
+    DoDeployConfigLog(nil, 'Project file is not exist.');
     Exit;
   end;
 
   AXMLDocument := TXMLDocument.Create(Application);
+
   try
     AXMLDocument.LoadFromFile(AProjectFilePath);
     AXMLDocument.Active := True;
     AXMLNode            := AXMLDocument.DocumentElement;
+    AXMLNode            := AXMLDocument.DocumentElement;
 
-    AXMLNode := AXMLDocument.DocumentElement;
     if AXMLNode <> nil then
     begin
       for I := 0 to AXMLNode.ChildNodes.Count - 1 do
       begin
         AXMLChildNode := AXMLNode.ChildNodes[I];
 
-        // Android
-        if (AXMLChildNode.NodeName = 'PropertyGroup')
-          and ((AXMLChildNode.Attributes['Condition'] = '''$(Base_Android)''!=''''') or (AXMLChildNode.Attributes['Condition'] = '''$(Cfg_1_Android)''!=''''')
-          or (AXMLChildNode.Attributes['Condition'] = '''$(Cfg_2_Android)''!=''''')
-          or (AXMLChildNode.Attributes['Condition'] = '''$(Base_Android64)''!=''''')
-          or (AXMLChildNode.Attributes['Condition'] = '''$(Cfg_1_Android64)''!=''''')
-          or (AXMLChildNode.Attributes['Condition'] = '''$(Cfg_2_Android64)''!=''''')
+        //Android
+        if (
+             AXMLChildNode.NodeName = 'PropertyGroup')
+             and ((AXMLChildNode.Attributes['Condition'] = '''$(Base_Android)''!='''''   )
+             or   (AXMLChildNode.Attributes['Condition'] = '''$(Cfg_1_Android)''!='''''  )
+             or   (AXMLChildNode.Attributes['Condition'] = '''$(Cfg_2_Android)''!='''''  )
+             or   (AXMLChildNode.Attributes['Condition'] = '''$(Base_Android64)''!=''''' )
+             or   (AXMLChildNode.Attributes['Condition'] = '''$(Cfg_1_Android64)''!=''''')
+             or   (AXMLChildNode.Attributes['Condition'] = '''$(Cfg_2_Android64)''!=''''')
           )
         then
         begin
-          SaveProjectPictureToProjectXMLNode(36, 36, 'Android_LauncherIcon36', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(48, 48, 'Android_LauncherIcon48', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(72, 72, 'Android_LauncherIcon72', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(96, 96, 'Android_LauncherIcon96', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(144, 144, 'Android_LauncherIcon144', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(192, 192, 'Android_LauncherIcon192', AXMLNode.ChildNodes[I]);
-
-          SaveProjectPictureToProjectXMLNode(24, 24, 'Android_NotificationIcon24', AXMLNode.ChildNodes[I], '24_24.png');
-          SaveProjectPictureToProjectXMLNode(36, 36, 'Android_NotificationIcon36', AXMLNode.ChildNodes[I], '36_36.png');
-          SaveProjectPictureToProjectXMLNode(48, 48, 'Android_NotificationIcon48', AXMLNode.ChildNodes[I], '48_48.png');
-          SaveProjectPictureToProjectXMLNode(72, 72, 'Android_NotificationIcon72', AXMLNode.ChildNodes[I], '72_72.png');
-          SaveProjectPictureToProjectXMLNode(96, 96, 'Android_NotificationIcon96', AXMLNode.ChildNodes[I], '96_96.png');
+          //D:\2.2 GitHub Adriano Santos\xPlat.OpenPDF\samples\Delphi 10\images\
+          SaveProjectPictureToProjectXMLNode(36 , 36 , 'Android_LauncherIcon36'    , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(48 , 48 , 'Android_LauncherIcon48'    , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(72 , 72 , 'Android_LauncherIcon72'    , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(96 , 96 , 'Android_LauncherIcon96'    , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(144, 144, 'Android_LauncherIcon144'   , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(192, 192, 'Android_LauncherIcon192'   , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(24 , 24 , 'Android_NotificationIcon24', AXMLNode.ChildNodes[I], '24_24.png');
+          SaveProjectPictureToProjectXMLNode(36 , 36 , 'Android_NotificationIcon36', AXMLNode.ChildNodes[I], '36_36.png');
+          SaveProjectPictureToProjectXMLNode(48 , 48 , 'Android_NotificationIcon48', AXMLNode.ChildNodes[I], '48_48.png');
+          SaveProjectPictureToProjectXMLNode(72 , 72 , 'Android_NotificationIcon72', AXMLNode.ChildNodes[I], '72_72.png');
+          SaveProjectPictureToProjectXMLNode(96 , 96 , 'Android_NotificationIcon96', AXMLNode.ChildNodes[I], '96_96.png');
         end;
 
         // IOS
@@ -5191,32 +5188,32 @@ begin
           )
         then
         begin
-          SaveProjectPictureToProjectXMLNode(57, 57, 'iPhone_AppIcon57', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(60, 60, 'iPhone_AppIcon60', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(87, 87, 'iPhone_AppIcon87', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(114, 114, 'iPhone_AppIcon114', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(120, 120, 'iPhone_AppIcon120', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(180, 180, 'iPhone_AppIcon180', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(72, 72, 'iPad_AppIcon72', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(76, 76, 'iPad_AppIcon76', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(144, 144, 'iPad_AppIcon144', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(152, 152, 'iPad_AppIcon152', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(29, 29, 'iPhone_Spotlight29', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(40, 40, 'iPhone_Spotlight40', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(58, 58, 'iPhone_Spotlight58', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(80, 80, 'iPhone_Spotlight80', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(40, 40, 'iPad_Spotlight40', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(50, 50, 'iPad_Spotlight50', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(80, 80, 'iPad_Spotlight80', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(100, 100, 'iPad_Spotlight100', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(29, 29, 'iPad_Setting29', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(58, 58, 'iPad_Setting58', AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(57  , 57  , 'iPhone_AppIcon57'    , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(60  , 60  , 'iPhone_AppIcon60'    , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(87  , 87  , 'iPhone_AppIcon87'    , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(114 , 114 , 'iPhone_AppIcon114'   , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(120 , 120 , 'iPhone_AppIcon120'   , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(180 , 180 , 'iPhone_AppIcon180'   , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(72  , 72  , 'iPad_AppIcon72'      , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(76  , 76  , 'iPad_AppIcon76'      , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(144 , 144 , 'iPad_AppIcon144'     , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(152 , 152 , 'iPad_AppIcon152'     , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(29  , 29  , 'iPhone_Spotlight29'  , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(40  , 40  , 'iPhone_Spotlight40'  , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(58  , 58  , 'iPhone_Spotlight58'  , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(80  , 80  , 'iPhone_Spotlight80'  , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(40  , 40  , 'iPad_Spotlight40'    , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(50  , 50  , 'iPad_Spotlight50'    , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(80  , 80  , 'iPad_Spotlight80'    , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(100 , 100 , 'iPad_Spotlight100'   , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(29  , 29  , 'iPad_Setting29'      , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(58  , 58  , 'iPad_Setting58'      , AXMLNode.ChildNodes[I]);
 
           // 10.3
-          SaveProjectPictureToProjectXMLNode(83, 83, 'iPad_AppIcon83_5', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(167, 167, 'iPad_AppIcon167', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(120, 120, 'iPhone_Spotlight120', AXMLNode.ChildNodes[I]);
-          SaveProjectPictureToProjectXMLNode(1024, 1024, 'iOS_AppStore1024', AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(83  , 83  , 'iPad_AppIcon83_5'    , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(167 , 167 , 'iPad_AppIcon167'     , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(120 , 120 , 'iPhone_Spotlight120' , AXMLNode.ChildNodes[I]);
+          SaveProjectPictureToProjectXMLNode(1024, 1024, 'iOS_AppStore1024'    , AXMLNode.ChildNodes[I]);
         end;
       end;
     end;
@@ -5410,19 +5407,16 @@ begin
   APictureNode := AXMLNode.ChildNodes.FindNode(ANodeName);
   if APictureNode = nil then
   begin
-    // 不存在,则添加
     APictureNode := AXMLNode.AddChild(ANodeName);
   end;
 
   if AText = '' then
   begin
-    APictureNode.Text := IntToStr(AIconWidth) + 'x' +
-      IntToStr(AIconHeight) + '.png';
+    APictureNode.Text := 'images\' + IntToStr(AIconWidth) + 'x' + IntToStr(AIconHeight) + '.png';
   end
   else
   begin
-    APictureNode.Text := AText;
-    // IntToStr(AIconWidth)+'_'+IntToStr(AIconHeight)+'.png';
+    APictureNode.Text := 'images\' + AText;
   end;
 end;
 

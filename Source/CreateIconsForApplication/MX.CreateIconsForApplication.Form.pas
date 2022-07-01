@@ -4,20 +4,20 @@ interface
 
 uses
   ToolsApi,
+  uFuncCommon_Copy,
+  uOrangeUISmartSDKDeployment,
 
-  System.Classes,
-  System.SysUtils,
-  System.Variants,
-  System.Types,
-  System.Math,
-
-  Winapi.GDIPOBJ,
   Winapi.GDIPAPI,
-  Winapi.Windows,
+  Winapi.GDIPOBJ,
   Winapi.GDIPUTIL,
+  Winapi.Messages,
+  Winapi.Windows,
 
   Vcl.Controls,
   Vcl.Dialogs,
+  Vcl.ExtCtrls,
+  Vcl.ExtDlgs,
+  Vcl.FileCtrl,
   Vcl.Forms,
   Vcl.Graphics,
   Vcl.StdCtrls,
@@ -25,60 +25,68 @@ uses
   FMX.Graphics,
   FMX.Types,
 
-  Winapi.Messages,
-  uFuncCommon_Copy,
-  uOrangeUISmartSDKDeployment,
+  MX.Template.Form,
 
-  Vcl.ExtCtrls,
-  Vcl.ExtDlgs,
+  System.Classes,
+  System.Math,
+  System.SysUtils,
+  System.Types,
+  System.Variants,
 
-  MX.Template.Form, Vcl.FileCtrl;
+  System.Threading, Vcl.Buttons, System.ImageList, Vcl.ImgList;
 
 type
   TFrmCreateIconsForApplication = class(TFrmTemplate)
     pnlAppIcon: TPanel;
     lblAppIconHint: TLabel;
     btnSelectProjectIcon: TButton;
-    btnProcessProjectIcon: TButton;
-    Panel9: TPanel;
+    pnlIconImage: TPanel;
     imgProjectIcon: TImage;
     btnGenerateProjectIconEverySize: TButton;
-    edtIconCornerSizePercent: TEdit;
     pnlAppLaunch: TPanel;
-    lblAppLaunchImageHint: TLabel;
-    lblLaunchImageBackColorHint: TLabel;
-    lblLaunchImageScaleBaseHeightHint: TLabel;
-    lblBackColorHexCodeHint: TLabel;
-    cmbProjectLaunchBackColor: TColorListBox;
-    edtProjectLaunchBackColor: TEdit;
-    Panel12: TPanel;
-    imgProjectLaunchImage: TImage;
-    btnSelectProjectLaunchImage: TButton;
-    btnGenerateProjectLaunchImageEverySize: TButton;
-    btnProcessProjectLaunchImage: TButton;
-    btnCombineLaunchImageByBackColor: TButton;
-    edtScaleBaseHeight: TEdit;
-    pnlTop: TPanel;
-    lblCurrentProject: TLabel;
-    btnSelectProject: TButton;
-    edtProjectFilePath: TComboBox;
     opdSelectProjectIcon: TOpenPictureDialog;
     opdSelectProjectLaunchImage: TOpenPictureDialog;
     odSelectProject: TOpenDialog;
     pnlTools: TPanel;
     pnlLeft: TPanel;
-    Panel1: TPanel;
+    pnlImages: TPanel;
+    fileList: TFileListBox;
+    lblAppLaunchImageHint: TLabel;
+    pnlLauchImage: TPanel;
+    imgProjectLaunchImage: TImage;
+    SpeedButton1: TSpeedButton;
+    SpeedButton2: TSpeedButton;
+    imgList: TImageList;
+    btnSelectProjectLaunchImage: TButton;
+    lblLaunchImageBackColorHint: TLabel;
+    cmbProjectLaunchBackColor: TColorListBox;
+    lblBackColorHexCodeHint: TLabel;
+    edtProjectLaunchBackColor: TEdit;
+    lblLaunchImageScaleBaseHeightHint: TLabel;
+    edtScaleBaseHeight: TEdit;
+    btnGenerateProjectLaunchImageEverySize: TButton;
+    btnCombineLaunchImageByBackColor: TButton;
+    Label1: TLabel;
+    btnProcessProjectLaunchImage: TButton;
+    Label2: TLabel;
+    Label3: TLabel;
+    chkBackup: TCheckBox;
+    edtProjectFilePath: TEdit;
+    lblCurrentProject: TLabel;
+    btnProcessProjectIcon: TButton;
+    Bevel1: TBevel;
     procedure btnCombineLaunchImageByBackColorClick(Sender: TObject);
     procedure btnGenerateProjectIconEverySizeClick(Sender: TObject);
     procedure btnGenerateProjectLaunchImageEverySizeClick(Sender: TObject);
     procedure btnProcessProjectIconClick(Sender: TObject);
     procedure btnProcessProjectLaunchImageClick(Sender: TObject);
-    procedure btnSelectProjectClick(Sender: TObject);
     procedure btnSelectProjectIconClick(Sender: TObject);
     procedure btnSelectProjectLaunchImageClick(Sender: TObject);
     procedure cmbProjectLaunchBackColorClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
+    procedure SpeedButton1Click(Sender: TObject);
+    procedure SpeedButton2Click(Sender: TObject);
     private
       { Private declarations }
       FProjectLaunchImageFileName : String;
@@ -86,16 +94,18 @@ type
       FProjectConfig              : TProjectConfig;
       FCurrentConfigFileName      : String;
       FFilename                   : String;
+      FProject                    : IOTAProject;
     public
       { Public declarations }
       function FileName(AFilename: String): TFrmCreateIconsForApplication;
+      property Project : IOTAProject read FProject write FProject;
   end;
 
 procedure SizePicture(APictureFilePath: String;
   AWidth, AHeight: Integer;
   ASaveDir: String;
   DevideChar: String;
-  AFileName: String = '';
+  AFilename: String = '';
   ACornerSizePercent: Double = 0);
 
 procedure CombineSizePictureByBackColor(
@@ -105,17 +115,18 @@ procedure CombineSizePictureByBackColor(
   AWidth, AHeight: Integer;
   ASaveDir: String;
   DevideChar: String;
-  AFileName: String = '');
+  AFilename: String = '');
 
 implementation
 
 {$R *.dfm}
 
+
 procedure SizePicture(APictureFilePath: String;
   AWidth, AHeight: Integer;
   ASaveDir: String;
   DevideChar: String;
-  AFileName: String = '';
+  AFilename: String = '';
   ACornerSizePercent: Double = 0);
 var
   ASrcBitmap:    TBitmap;
@@ -123,7 +134,7 @@ var
   ATempFileName: String;
   ASavedBitmap:  TBitmap;
 begin
-  ATempFileName := AFileName;
+  ATempFileName := AFilename;
   if ATempFileName = '' then
   begin
     ATempFileName := IntToStr(AWidth) + DevideChar + IntToStr(AHeight) + '.png';
@@ -154,11 +165,11 @@ begin
       ASavedBitmap.Canvas.Fill.Bitmap.Bitmap := ADestBitmap;
       ASavedBitmap.Canvas.Fill.Kind          := TBrushKind.Bitmap;
       ASavedBitmap.Canvas.FillRect(RectF(0, 0, ADestBitmap.Width,
-        ADestBitmap.Height),
+          ADestBitmap.Height),
         ACornerSizePercent,
         ACornerSizePercent,
         [TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft,
-        TCorner.BottomRight],
+          TCorner.BottomRight],
         1
         );
     end
@@ -196,7 +207,7 @@ procedure CombineSizePictureByBackColor(
   AWidth, AHeight: Integer;
   ASaveDir: String;
   DevideChar: String;
-  AFileName: String = '');
+  AFilename: String = '');
 var
   ASrcBitmap:                 TGPBitmap;
   ADestBitmap:                TGPBitmap;
@@ -208,7 +219,7 @@ var
   ATempFileName:              String;
 begin
   AMiddlePictureStretchScale := AHeight / AMiddlePictureStretchScaleBaseHeight;
-  ATempFileName              := AFileName;
+  ATempFileName              := AFilename;
   if ATempFileName = '' then
   begin
     ATempFileName := IntToStr(AWidth) + DevideChar + IntToStr(AHeight) + '.png';
@@ -219,16 +230,14 @@ begin
   try
     AGPBackColor := ColorRefToARGB(ABackColor);
     ADestBitmapGraphics.Clear(AGPBackColor);
-    ALeft := Ceil(ADestBitmap.GetWidth - ASrcBitmap.GetWidth *
-      AMiddlePictureStretchScale) div 2;
-    ATop := Ceil(ADestBitmap.GetHeight - ASrcBitmap.GetHeight *
-      AMiddlePictureStretchScale) div 2;
+    ALeft := Ceil(ADestBitmap.GetWidth - ASrcBitmap.GetWidth * AMiddlePictureStretchScale) div 2;
+    ATop := Ceil(ADestBitmap.GetHeight - ASrcBitmap.GetHeight * AMiddlePictureStretchScale) div 2;
     ADestBitmapGraphics.DrawImage(
       ASrcBitmap,
       MakeRect(ALeft,
-      ATop,
-      ASrcBitmap.GetWidth * AMiddlePictureStretchScale,
-      ASrcBitmap.GetHeight * AMiddlePictureStretchScale),
+        ATop,
+        ASrcBitmap.GetWidth * AMiddlePictureStretchScale,
+        ASrcBitmap.GetHeight * AMiddlePictureStretchScale),
       0, 0, ASrcBitmap.GetWidth, ASrcBitmap.GetHeight,
       TUnit.UnitPixel
       );
@@ -260,106 +269,76 @@ begin
   end;
 end;
 
-procedure TFrmCreateIconsForApplication.btnCombineLaunchImageByBackColorClick(
-  Sender: TObject);
+procedure TFrmCreateIconsForApplication.btnCombineLaunchImageByBackColorClick(Sender: TObject);
 var
-  ASaveDir:         String;
-  ABackColor:       TColor;
-  AScaleBaseHeight: Integer;
+  ASaveDir         : String;
+  ABackColor       : TColor;
+  AScaleBaseHeight : Integer;
 begin
   if Self.edtProjectLaunchBackColor.Text = '' then
   begin
-    ShowMessage('Please select color first');
+    ShowMessage('Please select color first.');
     Exit;
   end;
+
   // ARGB->0BGR
-  ABackColor := StrToInt('$' + Copy(Self.edtProjectLaunchBackColor.Text, 1 + 2,
-    2))
+  ABackColor :=
+      StrToInt('$' + Copy(Self.edtProjectLaunchBackColor.Text, 1 + 2, 2))
     + StrToInt('$' + Copy(Self.edtProjectLaunchBackColor.Text, 1 + 4, 2)) shl 8
-    + StrToInt('$' + Copy(Self.edtProjectLaunchBackColor.Text, 1 + 6,
-    2)) shl 16;
+    + StrToInt('$' + Copy(Self.edtProjectLaunchBackColor.Text, 1 + 6, 2)) shl 16;
+
   AScaleBaseHeight := StrToInt(Self.edtScaleBaseHeight.Text);
-  if FileExists(Self.edtProjectFilePath.Text) and
-    FileExists(FProjectLaunchImageFileName) then
+
+  if FileExists(Self.edtProjectFilePath.Text) and FileExists(FProjectLaunchImageFileName) then
   begin
-    ASaveDir := ExtractFilePath(Self.edtProjectFilePath.Text);
+    ASaveDir := Format('%s\images\', [ExtractFilePath(Self.edtProjectFilePath.Text)]);
+    fileList.Directory := ASaveDir;
+
     SizePicture(FProjectLaunchImageFileName, 426, 320, ASaveDir, 'x');
     SizePicture(FProjectLaunchImageFileName, 470, 320, ASaveDir, 'x');
     SizePicture(FProjectLaunchImageFileName, 640, 480, ASaveDir, 'x');
     SizePicture(FProjectLaunchImageFileName, 960, 720, ASaveDir, 'x');
     // IOS
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 320, 480, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 640, 960, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 640, 1136, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 750, 1334, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 1242, 2208, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 1242, 2208, ASaveDir, 'x', '1242x2208 - light-2x.png');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 1242, 2208, ASaveDir, 'x', '1242x2208 - dark-2x.png');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 2208, 1242, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 2208, 1242, ASaveDir, 'x', '2208x1242 - light-2x.png');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 2208, 1242, ASaveDir, 'x', '2208x1242 - dark-2x.png');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 2048, 1536, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 2048, 1496, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 1536, 2048, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 1496, 2048, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 1536, 2008, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 1024, 768, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 1024, 748, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 768, 1024, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 768, 1004, ASaveDir, 'x');
-    // 10.3
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 1136, 640, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 1334, 750, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 828, 1792, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 1792, 828, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 1125, 2436, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 2436, 1125, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 1242, 2688, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 1242, 2688, ASaveDir, 'x', '1242x2688 - light-3x.png');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 1242, 2688, ASaveDir, 'x', '1242x2688 - dark-3x.png');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 2688, 1242, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 1668, 2224, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 2224, 1668, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 1668, 2388, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 2388, 1668, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 2048, 2732, ASaveDir, 'x');
-    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor,
-      AScaleBaseHeight, 2732, 2048, ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 320 , 480 , ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 640 , 960 , ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 640 , 1136, ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 750 , 1334, ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 1242, 2208, ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 1242, 2208, ASaveDir, 'x', '1242x2208 - light-2x.png');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 1242, 2208, ASaveDir, 'x', '1242x2208 - dark-2x.png');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 2208, 1242, ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 2208, 1242, ASaveDir, 'x', '2208x1242 - light-2x.png');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 2208, 1242, ASaveDir, 'x', '2208x1242 - dark-2x.png');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 2048, 1536, ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 2048, 1496, ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 1536, 2048, ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 1496, 2048, ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 1536, 2008, ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 1024, 768 , ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 1024, 748 , ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 768 , 1024, ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 768 , 1004, ASaveDir, 'x');
 
+    // 10.3
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 1136, 640 , ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 1334, 750 , ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 828 , 1792, ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 1792, 828 , ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 1125, 2436, ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 2436, 1125, ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 1242, 2688, ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 1242, 2688, ASaveDir, 'x', '1242x2688 - light-3x.png');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 1242, 2688, ASaveDir, 'x', '1242x2688 - dark-3x.png');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 2688, 1242, ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 1668, 2224, ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 2224, 1668, ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 1668, 2388, ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 2388, 1668, ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 2048, 2732, ASaveDir, 'x');
+    CombineSizePictureByBackColor(FProjectLaunchImageFileName, ABackColor, AScaleBaseHeight, 2732, 2048, ASaveDir, 'x');
+
+    fileList.Update;
+    MessageDlg('Images created successfully!', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
   end
   else
   begin
@@ -367,159 +346,111 @@ begin
   end;
 end;
 
-
-
-procedure TFrmCreateIconsForApplication.btnGenerateProjectIconEverySizeClick(
-  Sender: TObject);
+procedure TFrmCreateIconsForApplication.btnGenerateProjectIconEverySizeClick(Sender: TObject);
 var
   ASaveDir:            String;
   AGetuiPushSDKResDir: String;
   ACornerSizePercent:  Double;
 begin
-  if FileExists(Self.edtProjectFilePath.Text) and
-    FileExists(FProjectIconFileName) then
+  if FileExists(Self.edtProjectFilePath.Text) and FileExists(FProjectIconFileName) then
   begin
     ACornerSizePercent := 0;
-    TryStrToFloat(Self.edtIconCornerSizePercent.Text, ACornerSizePercent);
-    ASaveDir := ExtractFilePath(Self.edtProjectFilePath.Text);
-    SizePicture(FProjectIconFileName, 24, 24, ASaveDir, '_', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 36, 36, ASaveDir, '_', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 48, 48, ASaveDir, '_', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 72, 72, ASaveDir, '_', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 96, 96, ASaveDir, '_', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 28, 28, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 29, 29, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 32, 32, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 36, 36, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 40, 40, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 48, 48, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 50, 50, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 57, 57, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 58, 58, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 60, 60, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 72, 72, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 76, 76, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 80, 80, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 83, 83, ASaveDir, 'x', '83.5x83.5.png',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 87, 87, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 96, 96, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 100, 100, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 108, 108, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 114, 114, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 120, 120, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 144, 144, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 152, 152, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 180, 180, ASaveDir, 'x', '',
-      ACornerSizePercent);
+
+    ASaveDir := Format('%s\images\', [ExtractFilePath(Self.edtProjectFilePath.Text)]);
+    ForceDirectories(ASaveDir);
+
+    fileList.Directory := ASaveDir;
+
+    SizePicture(FProjectIconFileName, 24  , 24   , ASaveDir, '_', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 36  , 36   , ASaveDir, '_', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 48  , 48   , ASaveDir, '_', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 72  , 72   , ASaveDir, '_', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 96  , 96   , ASaveDir, '_', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 28  , 28   , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 29  , 29   , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 32  , 32   , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 36  , 36   , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 40  , 40   , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 48  , 48   , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 50  , 50   , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 57  , 57   , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 58  , 58   , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 60  , 60   , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 72  , 72   , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 76  , 76   , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 80  , 80   , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 83  , 83   , ASaveDir, 'x', '83.5x83.5.png' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 87  , 87   , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 96  , 96   , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 100 , 100  , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 108 , 108  , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 114 , 114  , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 120 , 120  , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 144 , 144  , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 152 , 152  , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 180 , 180  , ASaveDir, 'x', ''              , ACornerSizePercent);
+
     // 10.3 83.5
-    SizePicture(FProjectIconFileName, 83, 83, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 167, 167, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 192, 192, ASaveDir, 'x', '',
-      ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 1024, 1024, ASaveDir, 'x', '',
-      ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 83  , 83   , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 167 , 167  , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 192 , 192  , ASaveDir, 'x', ''              , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 1024, 1024 , ASaveDir, 'x', ''              , ACornerSizePercent);
+
     AGetuiPushSDKResDir := ASaveDir + 'GetuiPushSDK\Android_2_10_2\res\';
+
     // Gere um ícone de push para a versão 2.10.2
-    SizePicture(FProjectIconFileName, 96, 96, AGetuiPushSDKResDir +
-      'drawable-hdpi\push.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 36, 36, AGetuiPushSDKResDir +
-      'drawable-hdpi\push_small.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 48, 48, AGetuiPushSDKResDir +
-      'drawable-ldpi\push.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 18, 18, AGetuiPushSDKResDir +
-      'drawable-ldpi\push_small.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 64, 64, AGetuiPushSDKResDir +
-      'drawable-mdpi\push.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 24, 24, AGetuiPushSDKResDir +
-      'drawable-mdpi\push_small.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 128, 128, AGetuiPushSDKResDir +
-      'drawable-xhdpi\push.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 48, 48, AGetuiPushSDKResDir +
-      'drawable-xhdpi\push_small.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 192, 192, AGetuiPushSDKResDir +
-      'drawable-xxhdpi\push.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 72, 72, AGetuiPushSDKResDir +
-      'drawable-xxhdpi\push_small.png', 'x', '', ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 96  , 96 , AGetuiPushSDKResDir + 'drawable-hdpi\push.png'         , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 36  , 36 , AGetuiPushSDKResDir + 'drawable-hdpi\push_small.png'   , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 48  , 48 , AGetuiPushSDKResDir + 'drawable-ldpi\push.png'         , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 18  , 18 , AGetuiPushSDKResDir + 'drawable-ldpi\push_small.png'   , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 64  , 64 , AGetuiPushSDKResDir + 'drawable-mdpi\push.png'         , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 24  , 24 , AGetuiPushSDKResDir + 'drawable-mdpi\push_small.png'   , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 128 , 128, AGetuiPushSDKResDir + 'drawable-xhdpi\push.png'        , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 48  , 48 , AGetuiPushSDKResDir + 'drawable-xhdpi\push_small.png'  , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 192 , 192, AGetuiPushSDKResDir + 'drawable-xxhdpi\push.png'       , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 72  , 72 , AGetuiPushSDKResDir + 'drawable-xxhdpi\push_small.png' , 'x' , '' , ACornerSizePercent);
+
     AGetuiPushSDKResDir := ASaveDir + 'GetuiPushSDK\Android_4_3_2\res\';
+
     // Gerar um ícone de push para a versão 2.10.5
-    SizePicture(FProjectIconFileName, 96, 96, AGetuiPushSDKResDir +
-      'drawable-hdpi\push.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 36, 36, AGetuiPushSDKResDir +
-      'drawable-hdpi\push_small.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 48, 48, AGetuiPushSDKResDir +
-      'drawable-ldpi\push.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 18, 18, AGetuiPushSDKResDir +
-      'drawable-ldpi\push_small.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 64, 64, AGetuiPushSDKResDir +
-      'drawable-mdpi\push.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 24, 24, AGetuiPushSDKResDir +
-      'drawable-mdpi\push_small.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 128, 128, AGetuiPushSDKResDir +
-      'drawable-xhdpi\push.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 48, 48, AGetuiPushSDKResDir +
-      'drawable-xhdpi\push_small.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 192, 192, AGetuiPushSDKResDir +
-      'drawable-xxhdpi\push.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 72, 72, AGetuiPushSDKResDir +
-      'drawable-xxhdpi\push_small.png', 'x', '', ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 96 , 96 , AGetuiPushSDKResDir + 'drawable-hdpi\push.png'          , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 36 , 36 , AGetuiPushSDKResDir + 'drawable-hdpi\push_small.png'    , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 48 , 48 , AGetuiPushSDKResDir + 'drawable-ldpi\push.png'          , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 18 , 18 , AGetuiPushSDKResDir + 'drawable-ldpi\push_small.png'    , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 64 , 64 , AGetuiPushSDKResDir + 'drawable-mdpi\push.png'          , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 24 , 24 , AGetuiPushSDKResDir + 'drawable-mdpi\push_small.png'    , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 128, 128, AGetuiPushSDKResDir + 'drawable-xhdpi\push.png'         , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 48 , 48 , AGetuiPushSDKResDir + 'drawable-xhdpi\push_small.png'   , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 192, 192, AGetuiPushSDKResDir + 'drawable-xxhdpi\push.png'        , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 72 , 72 , AGetuiPushSDKResDir + 'drawable-xxhdpi\push_small.png'  , 'x' , '' , ACornerSizePercent);
 
     AGetuiPushSDKResDir := ASaveDir + 'GetuiPushSDK\Android_2_13_0_0\res\';
+
     // Gere um ícone de push para a versão 2.10.2
-    SizePicture(FProjectIconFileName, 96, 96, AGetuiPushSDKResDir +
-      'drawable-hdpi\push.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 36, 36, AGetuiPushSDKResDir +
-      'drawable-hdpi\push_small.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 48, 48, AGetuiPushSDKResDir +
-      'drawable-ldpi\push.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 18, 18, AGetuiPushSDKResDir +
-      'drawable-ldpi\push_small.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 64, 64, AGetuiPushSDKResDir +
-      'drawable-mdpi\push.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 24, 24, AGetuiPushSDKResDir +
-      'drawable-mdpi\push_small.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 128, 128, AGetuiPushSDKResDir +
-      'drawable-xhdpi\push.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 48, 48, AGetuiPushSDKResDir +
-      'drawable-xhdpi\push_small.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 192, 192, AGetuiPushSDKResDir +
-      'drawable-xxhdpi\push.png', 'x', '', ACornerSizePercent);
-    SizePicture(FProjectIconFileName, 72, 72, AGetuiPushSDKResDir +
-      'drawable-xxhdpi\push_small.png', 'x', '', ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 96 , 96 , AGetuiPushSDKResDir + 'drawable-hdpi\push.png'          , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 36 , 36 , AGetuiPushSDKResDir + 'drawable-hdpi\push_small.png'    , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 48 , 48 , AGetuiPushSDKResDir + 'drawable-ldpi\push.png'          , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 18 , 18 , AGetuiPushSDKResDir + 'drawable-ldpi\push_small.png'    , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 64 , 64 , AGetuiPushSDKResDir + 'drawable-mdpi\push.png'          , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 24 , 24 , AGetuiPushSDKResDir + 'drawable-mdpi\push_small.png'    , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 128, 128, AGetuiPushSDKResDir + 'drawable-xhdpi\push.png'         , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 48 , 48 , AGetuiPushSDKResDir + 'drawable-xhdpi\push_small.png'   , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 192, 192, AGetuiPushSDKResDir + 'drawable-xxhdpi\push.png'        , 'x' , '' , ACornerSizePercent);
+    SizePicture(FProjectIconFileName, 72 , 72 , AGetuiPushSDKResDir + 'drawable-xxhdpi\push_small.png'  , 'x' , '' , ACornerSizePercent);
+
+    TTask.Run(
+      procedure ()
+      begin
+        fileList.Update;
+      end
+    );
+
+    MessageDlg('Icons created successfully!', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
   end
   else
   begin
-    ShowMessage('Arquivo de projeto ou arquivo de imagem não existe');
+    MessageDlg('Project File or Image File does not exist', TMsgDlgType.mtError, [TMsgDlgBtn.mbOK], 0);
   end;
-
 end;
 
 procedure
@@ -528,47 +459,46 @@ procedure
 var
   ASaveDir: String;
 begin
-  if FileExists(Self.edtProjectFilePath.Text) and
-    FileExists(FProjectLaunchImageFileName) then
+  if FileExists(Self.edtProjectFilePath.Text) and FileExists(FProjectLaunchImageFileName) then
   begin
-    ASaveDir := ExtractFilePath(Self.edtProjectFilePath.Text);
+    ASaveDir := Format('%s\images\', [ExtractFilePath(Self.edtProjectFilePath.Text)]);
+    fileList.Directory := ASaveDir;
+
     // Android, deve usar 9patch e renomear
-    SizePicture(FProjectLaunchImageFileName, 426, 320, ASaveDir, 'x');
-    SizePicture(FProjectLaunchImageFileName, 470, 320, ASaveDir, 'x');
-    SizePicture(FProjectLaunchImageFileName, 640, 480, ASaveDir, 'x');
-    SizePicture(FProjectLaunchImageFileName, 960, 720, ASaveDir, 'x');
-    // IOS
-    SizePicture(FProjectLaunchImageFileName, 320, 480, ASaveDir, 'x');
-    SizePicture(FProjectLaunchImageFileName, 640, 960, ASaveDir, 'x');
-    SizePicture(FProjectLaunchImageFileName, 640, 1136, ASaveDir, 'x');
-    SizePicture(FProjectLaunchImageFileName, 750, 1334, ASaveDir, 'x');
+    SizePicture(FProjectLaunchImageFileName, 426 , 320 , ASaveDir, 'x');
+    SizePicture(FProjectLaunchImageFileName, 470 , 320 , ASaveDir, 'x');
+    SizePicture(FProjectLaunchImageFileName, 640 , 480 , ASaveDir, 'x');
+    SizePicture(FProjectLaunchImageFileName, 960 , 720 , ASaveDir, 'x');
+
+    // iOS
+    SizePicture(FProjectLaunchImageFileName, 320 , 480 , ASaveDir, 'x');
+    SizePicture(FProjectLaunchImageFileName, 640 , 960 , ASaveDir, 'x');
+    SizePicture(FProjectLaunchImageFileName, 640 , 1136, ASaveDir, 'x');
+    SizePicture(FProjectLaunchImageFileName, 750 , 1334, ASaveDir, 'x');
     SizePicture(FProjectLaunchImageFileName, 1242, 2208, ASaveDir, 'x');
-    SizePicture(FProjectLaunchImageFileName, 1242, 2208, ASaveDir, 'x',
-      '1242x2208 - light-2x.png');
-    SizePicture(FProjectLaunchImageFileName, 1242, 2208, ASaveDir,
-      '1242x2208 - dark-2x.png');
+    SizePicture(FProjectLaunchImageFileName, 1242, 2208, ASaveDir, 'x', '1242x2208 - light-2x.png');
+    SizePicture(FProjectLaunchImageFileName, 1242, 2208, ASaveDir, '1242x2208 - dark-2x.png');
     SizePicture(FProjectLaunchImageFileName, 2208, 1242, ASaveDir, 'x');
     SizePicture(FProjectLaunchImageFileName, 2048, 1536, ASaveDir, 'x');
     SizePicture(FProjectLaunchImageFileName, 2048, 1496, ASaveDir, 'x');
     SizePicture(FProjectLaunchImageFileName, 1536, 2048, ASaveDir, 'x');
     SizePicture(FProjectLaunchImageFileName, 1496, 2048, ASaveDir, 'x');
     SizePicture(FProjectLaunchImageFileName, 1536, 2008, ASaveDir, 'x');
-    SizePicture(FProjectLaunchImageFileName, 1024, 768, ASaveDir, 'x');
-    SizePicture(FProjectLaunchImageFileName, 1024, 748, ASaveDir, 'x');
-    SizePicture(FProjectLaunchImageFileName, 768, 1024, ASaveDir, 'x');
-    SizePicture(FProjectLaunchImageFileName, 768, 1004, ASaveDir, 'x');
-    // 10.3
-    SizePicture(FProjectLaunchImageFileName, 1136, 640, ASaveDir, 'x');
-    SizePicture(FProjectLaunchImageFileName, 1334, 750, ASaveDir, 'x');
-    SizePicture(FProjectLaunchImageFileName, 828, 1792, ASaveDir, 'x');
-    SizePicture(FProjectLaunchImageFileName, 1792, 828, ASaveDir, 'x');
+    SizePicture(FProjectLaunchImageFileName, 1024, 768 , ASaveDir, 'x');
+    SizePicture(FProjectLaunchImageFileName, 1024, 748 , ASaveDir, 'x');
+    SizePicture(FProjectLaunchImageFileName, 768 , 1024, ASaveDir, 'x');
+    SizePicture(FProjectLaunchImageFileName, 768 , 1004, ASaveDir, 'x');
+
+    //10.3
+    SizePicture(FProjectLaunchImageFileName, 1136, 640 , ASaveDir, 'x');
+    SizePicture(FProjectLaunchImageFileName, 1334, 750 , ASaveDir, 'x');
+    SizePicture(FProjectLaunchImageFileName, 828 , 1792, ASaveDir, 'x');
+    SizePicture(FProjectLaunchImageFileName, 1792, 828 , ASaveDir, 'x');
     SizePicture(FProjectLaunchImageFileName, 1125, 2436, ASaveDir, 'x');
     SizePicture(FProjectLaunchImageFileName, 2436, 1125, ASaveDir, 'x');
     SizePicture(FProjectLaunchImageFileName, 1242, 2688, ASaveDir, 'x');
-    SizePicture(FProjectLaunchImageFileName, 1242, 2688, ASaveDir, 'x',
-      '1242x2688 - light-3x.png');
-    SizePicture(FProjectLaunchImageFileName, 1242, 2688, ASaveDir, 'x',
-      '1242x2688 - dark-3x.png');
+    SizePicture(FProjectLaunchImageFileName, 1242, 2688, ASaveDir, 'x', '1242x2688 - light-3x.png');
+    SizePicture(FProjectLaunchImageFileName, 1242, 2688, ASaveDir, 'x', '1242x2688 - dark-3x.png');
     SizePicture(FProjectLaunchImageFileName, 2688, 1242, ASaveDir, 'x');
     SizePicture(FProjectLaunchImageFileName, 1668, 2224, ASaveDir, 'x');
     SizePicture(FProjectLaunchImageFileName, 2224, 1668, ASaveDir, 'x');
@@ -576,6 +506,15 @@ begin
     SizePicture(FProjectLaunchImageFileName, 2388, 1668, ASaveDir, 'x');
     SizePicture(FProjectLaunchImageFileName, 2048, 2732, ASaveDir, 'x');
     SizePicture(FProjectLaunchImageFileName, 2732, 2048, ASaveDir, 'x');
+
+    TTask.Run(
+      procedure ()
+      begin
+        fileList.Update;
+      end
+    );
+
+    MessageDlg('Images created successfully!', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
   end
   else
   begin
@@ -583,40 +522,59 @@ begin
   end;
 end;
 
-procedure TFrmCreateIconsForApplication.btnProcessProjectIconClick(Sender:
-  TObject);
+procedure TFrmCreateIconsForApplication.btnProcessProjectIconClick(Sender: TObject);
+var
+  LDirectory : string;
+  LBackup    : string;
+  LOrigin    : string;
+  LDestiny   : string;
 begin
+  LDirectory := Format('%sbackup\', [ExtractFilePath(edtProjectFilePath.Text)]);
+  ForceDirectories(LDirectory);
+  LOrigin    := Copy(ExtractFileName(edtProjectFilePath.Text), 1, Length(ExtractFileName(edtProjectFilePath.Text))-6);
+  LDestiny   := Format('%s%s_%s.dproj', [LDirectory, LOrigin, FormatDateTime('yyyymmddhhmmss', now)]);
+
+  if chkBackup.Checked then
+    CopyFile(PChar(edtProjectFilePath.Text), PChar(LDestiny), True)
+  else
+    if MessageDlg('You have chosen not to perform a backup. Want to continue?', TMsgDlgType.mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+      exit;
+
   Self.FProjectConfig.SaveProjectIconToProject(Self.edtProjectFilePath.Text);
-end;
-
-procedure TFrmCreateIconsForApplication.btnProcessProjectLaunchImageClick(
-    Sender: TObject);
-begin
   Self.FProjectConfig.SaveProjectLaunchImageToProject(Self.edtProjectFilePath.Text);
+
+  MessageDlg('Icons and Lauch Images Added successfully!', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
+
+  TTask.run(
+    procedure ()
+    begin
+      FProject.Refresh(True);
+    end
+  );
 end;
 
-procedure TFrmCreateIconsForApplication.btnSelectProjectClick(Sender: TObject);
+procedure TFrmCreateIconsForApplication.btnProcessProjectLaunchImageClick(Sender: TObject);
 begin
-  if Self.odSelectProject.Execute(Handle) then
-    Self.edtProjectFilePath.Text := Self.odSelectProject.FileName;
-
-  if not Assigned(Self.FProjectConfig) then
-    FProjectConfig:=TProjectConfig.Create;
+//  Self.FProjectConfig.SaveProjectLaunchImageToProject(Self.edtProjectFilePath.Text);
+//  MessageDlg('Icons added successfully!', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
+//  TTask.run(
+//    procedure ()
+//    begin
+//      FProject.Refresh(True);
+//    end
+//  );
 end;
 
-procedure TFrmCreateIconsForApplication.btnSelectProjectIconClick(Sender:
-  TObject);
+procedure TFrmCreateIconsForApplication.btnSelectProjectIconClick(Sender: TObject);
 begin
   if Self.opdSelectProjectIcon.Execute(Handle) then
   begin
-    Self.imgProjectIcon.Picture.LoadFromFile
-      (Self.opdSelectProjectIcon.FileName);
+    Self.imgProjectIcon.Picture.LoadFromFile(Self.opdSelectProjectIcon.FileName);
     FProjectIconFileName := Self.opdSelectProjectIcon.FileName;
   end;
 end;
 
-procedure TFrmCreateIconsForApplication.btnSelectProjectLaunchImageClick(
-  Sender: TObject);
+procedure TFrmCreateIconsForApplication.btnSelectProjectLaunchImageClick(Sender: TObject);
 begin
   if Self.opdSelectProjectLaunchImage.Execute(Handle) then
   begin
@@ -627,7 +585,7 @@ begin
 end;
 
 procedure TFrmCreateIconsForApplication.cmbProjectLaunchBackColorClick(Sender:
-  TObject);
+    TObject);
 var
   ABackColor: TColor;
   AColorStr:  String;
@@ -642,10 +600,11 @@ begin
   Self.edtProjectLaunchBackColor.Text := AColorStr;
 end;
 
-function TFrmCreateIconsForApplication.FileName(AFilename: String): TFrmCreateIconsForApplication;
+function TFrmCreateIconsForApplication.FileName(AFilename: String)
+  : TFrmCreateIconsForApplication;
 begin
-  Result := Self;
-  FFileName := AFilename.Trim;
+  Result                  := Self;
+  FFilename               := AFilename.Trim;
   edtProjectFilePath.Text := AFilename.Trim;
 end;
 
@@ -658,22 +617,43 @@ end;
 
 procedure TFrmCreateIconsForApplication.FormCreate(Sender: TObject);
 var
-  Project : IOTAProject;
+  LProject: IOTAProject;
 begin
   inherited;
+
+  if not Assigned(Self.FProjectConfig) then
+    FProjectConfig := TProjectConfig.Create;
+
   {$IF CompilerVersion >= 32.0}
     (BorlandIDEServices as IOTAIDEThemingServices).RegisterFormClass(TFrmCreateIconsForApplication);
     (BorlandIDEServices as IOTAIDEThemingServices).ApplyTheme(Self);
+    (BorlandIDEServices as IOTAIDEThemingServices).ApplyTheme(fileList);
   {$ENDIF}
 
-  Project := GetActiveProject;
+  LProject := GetActiveProject;
+  FProject := LProject;
 
-  if ((UpperCase(Project.ApplicationType).Equals('APPLICATION')) or
-      (UpperCase(Project.ApplicationType).Equals('CONSOLE')) or
-      (UpperCase(Project.ApplicationType).Equals('LIBRARY'))
-     )
-  then edtProjectFilePath.Text := Project.FileName
+  ForceDirectories(Format('%s\images\', [ExtractFilePath(LProject.FileName)]));
+  fileList.Directory := Format('%s\images\', [ExtractFilePath(LProject.FileName)]);
+
+  if ((UpperCase(LProject.ApplicationType).Equals('APPLICATION')) or
+      (UpperCase(LProject.ApplicationType).Equals('CONSOLE')) or
+      (UpperCase(LProject.ApplicationType).Equals('LIBRARY'))
+    )
+  then edtProjectFilePath.Text := LProject.FileName
   else edtProjectFilePath.Text := EmptyStr;
+end;
+
+procedure TFrmCreateIconsForApplication.SpeedButton1Click(Sender: TObject);
+begin
+  Self.imgProjectIcon.Picture := nil;
+  FProjectIconFileName := EmptyStr;
+end;
+
+procedure TFrmCreateIconsForApplication.SpeedButton2Click(Sender: TObject);
+begin
+  Self.imgProjectLaunchImage.Picture := nil;
+  FProjectLaunchImageFileName := EmptyStr;
 end;
 
 end.

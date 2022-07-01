@@ -15,7 +15,7 @@ type
   TMXMainMenuWizard = class(TNotifierObject, IOTAWizard)
   private
     procedure createMenu;
-    function CreateSubMenu(AParent: TMenuItem; ACaption: string; AName: string; AOnClick: TNotifyEvent; AEnable : Boolean = True): TMenuItem;
+    function  CreateSubMenu(AParent: TMenuItem; ACaption: string; AName: string; AOnClick: TNotifyEvent; AEnable : Boolean = True): TMenuItem;
     procedure OnClickCreateIconsForApplication(Sender: TObject);
     procedure OnClickAbout(Sender: TObject);
   protected
@@ -136,19 +136,34 @@ begin
   finally
     FrmAbout.Free;
   end;
-
 end;
 
 procedure TMXMainMenuWizard.OnClickCreateIconsForApplication(Sender: TObject);
 var
+  LProject : IOTAProject;
   FrmCreateIconsForApplication : TFrmCreateIconsForApplication;
 begin
-  FrmCreateIconsForApplication := TFrmCreateIconsForApplication.Create(nil);
-  try
-    FrmCreateIconsForApplication.ShowModal;
-  finally
-    FrmCreateIconsForApplication.Free;
+  LProject := GetActiveProject;
+
+  if ((UpperCase(LProject.ApplicationType).Equals('APPLICATION')) or
+      (UpperCase(LProject.ApplicationType).Equals('CONSOLE')) or
+      (UpperCase(LProject.ApplicationType).Equals('LIBRARY'))
+     )
+  then
+  begin
+    FrmCreateIconsForApplication := TFrmCreateIconsForApplication.Create(nil);
+    try
+      FrmCreateIconsForApplication.ShowModal;
+    finally
+      FrmCreateIconsForApplication.Free;
+    end;
+  end
+  else
+  begin
+    MessageDlg('This type of project does not allow customizing icons.', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
+    exit;
   end;
 end;
+
 
 end.
