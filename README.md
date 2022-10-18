@@ -74,4 +74,4 @@ Ready. Your project has been modified and the icons updated. Just look at Projec
 [Português (ptBR)](https://github.com/adrianosantostreina/MobileExperts/blob/master/README-ptBR.md)<br>
 
 ## ⚠️ License
-`Mobile Experts` is free and open-source library licensed under the [MIT License](https://github.com/adrianosantostreina/MobileExperts/blob/main/LICENSE). 
+`Mobile Experts` is free and open-source library licensed under the [MIT License](https://github.com/adrianosantostreina/MobileExperts/blob/master/LICENSE). 
