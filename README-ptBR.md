@@ -69,6 +69,9 @@ Uma cópia do .dproj será criada marcando a caixa de seleção <b>Create backup
 
 Pronto. Seu projeto foi modificado e os ícones atualizados. Basta olhar em Projeto > Opções.
 
+## Vídeos no YouTube
+[Vídeo Spoiler](https://youtu.be/hcCN8FkYE30?sub_confirmation=1)
+
 ## Idiomas da documentação
 [Inglês (pt)](https://github.com/adrianosantostreina/MobileExperts/blob/master/README.md)<br>
 [Português (ptBR)](https://github.com/adrianosantostreina/MobileExperts/blob/master/README-ptBR.md)<br>

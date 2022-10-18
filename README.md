@@ -69,6 +69,9 @@ A copy of the .dproj will be created by selecting the <b>Create backup before ap
 
 Ready. Your project has been modified and the icons updated. Just look at Project > Options.
 
+## Videos on YouTube
+[Vídeo Spoiler](https://youtu.be/hcCN8FkYE30?sub_confirmation=1)
+
 ## Documentation Languages
 [English (en)](https://github.com/adrianosantostreina/MobileExperts/blob/master/README.md)<br>
 [Português (ptBR)](https://github.com/adrianosantostreina/MobileExperts/blob/master/README-ptBR.md)<br>
