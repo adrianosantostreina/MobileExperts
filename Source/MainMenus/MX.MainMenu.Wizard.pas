@@ -15,8 +15,9 @@ type
   TMXMainMenuWizard = class(TNotifierObject, IOTAWizard)
   private
     procedure createMenu;
-    function  CreateSubMenu(AParent: TMenuItem; ACaption: string; AName: string; AOnClick: TNotifyEvent; AEnable : Boolean = True): TMenuItem;
+    function CreateSubMenu(AParent: TMenuItem; ACaption: string; AName: string; AOnClick: TNotifyEvent; AEnable: Boolean = True): TMenuItem;
     procedure OnClickCreateIconsForApplication(Sender: TObject);
+    procedure OnClickMigrationTool(Sender: TObject);
     procedure OnClickAbout(Sender: TObject);
   protected
     function GetIDString: string;
@@ -51,9 +52,9 @@ end;
 
 procedure TMXMainMenuWizard.createMenu;
 var
-  LMainMenuDelphi                : TMainMenu;
-  LMenuName                      : string;
-  itemMobileExperts              : TMenuItem;
+  LMainMenuDelphi:   TMainMenu;
+  LMenuName:         string;
+  itemMobileExperts: TMenuItem;
 begin
   LMainMenuDelphi := (BorlandIDEServices as INTAServices).MainMenu;
   LMenuName       := 'imMobileExperts';
@@ -73,29 +74,30 @@ begin
     'imCreateIconsToProject',
     OnClickCreateIconsForApplication,
     True
-  );
+    );
+  // Planning
   CreateSubMenu(
     itemMobileExperts,
-    'Update Project to This Delphi...',
+    'Migration Tool...',
     'imUpdateProject',
-    nil
-  );
+    OnClickMigrationTool
+    );
   CreateSubMenu(
     itemMobileExperts,
     '-',
     'imDiv10',
     nil
-  );
+    );
   CreateSubMenu(
     itemMobileExperts,
     'About Mobile Experts',
     'imAbout',
     OnClickAbout
-  );
+    );
 end;
 
 function TMXMainMenuWizard.CreateSubMenu(AParent: TMenuItem; ACaption,
-  AName: string; AOnClick: TNotifyEvent; AEnable : Boolean = True): TMenuItem;
+  AName: string; AOnClick: TNotifyEvent; AEnable: Boolean = True): TMenuItem;
 begin
   Result         := TMenuItem.Create(AParent);
   Result.Caption := ACaption;
@@ -128,7 +130,7 @@ end;
 
 procedure TMXMainMenuWizard.OnClickAbout(Sender: TObject);
 var
-  FrmAbout : TFrmAbout;
+  FrmAbout: TFrmAbout;
 begin
   FrmAbout := TFrmAbout.Create(nil);
   try
@@ -140,15 +142,15 @@ end;
 
 procedure TMXMainMenuWizard.OnClickCreateIconsForApplication(Sender: TObject);
 var
-  LProject : IOTAProject;
-  FrmCreateIconsForApplication : TFrmCreateIconsForApplication;
+  LProject:                     IOTAProject;
+  FrmCreateIconsForApplication: TFrmCreateIconsForApplication;
 begin
   LProject := GetActiveProject;
 
   if ((UpperCase(LProject.ApplicationType).Equals('APPLICATION')) or
-      (UpperCase(LProject.ApplicationType).Equals('CONSOLE')) or
-      (UpperCase(LProject.ApplicationType).Equals('LIBRARY'))
-     )
+    (UpperCase(LProject.ApplicationType).Equals('CONSOLE')) or
+    (UpperCase(LProject.ApplicationType).Equals('LIBRARY'))
+    )
   then
   begin
     FrmCreateIconsForApplication := TFrmCreateIconsForApplication.Create(nil);
@@ -165,5 +167,9 @@ begin
   end;
 end;
 
+procedure TMXMainMenuWizard.OnClickMigrationTool(Sender: TObject);
+begin
+  MessageDlg('In development.', TMsgDlgType.mtWarning, [TMsgDlgBtn.mbOK], 0);
+end;
 
 end.

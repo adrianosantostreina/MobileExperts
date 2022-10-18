@@ -19,7 +19,7 @@ begin
   AddSplash;
   RegisterHelloWorldWizard;
   RegisterMainMenuWizard;
-  RegisterRepositoryWizard;
+  //RegisterRepositoryWizard;
   RegisterCreateIconsForApplication;
 end;
 
