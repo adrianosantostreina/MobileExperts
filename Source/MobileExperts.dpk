@@ -1,0 +1,56 @@
+package MobileExperts;
+
+{$R *.res}
+{$R *.dres}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS ON}
+{$RANGECHECKS ON}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  designide,
+  fmx;
+
+contains
+  MX.HelloWorld.Wizard in 'HelloWorld\MX.HelloWorld.Wizard.pas',
+  MX.MainMenu.Wizard in 'MainMenus\MX.MainMenu.Wizard.pas',
+  MX.Register in 'MX.Register.pas',
+  MX.Splash in 'Splash\MX.Splash.pas',
+  MX.NewProject.Wizard in 'NewProject\MX.NewProject.Wizard.pas',
+  MX.NewProject.Form in 'NewProject\MX.NewProject.Form.pas' {FrmNewProject},
+  MX.CreateIconsForApplication.Wizard in 'CreateIconsForApplication\MX.CreateIconsForApplication.Wizard.pas',
+  MX.CreateIconsForApplication.Form in 'CreateIconsForApplication\MX.CreateIconsForApplication.Form.pas' {FrmCreateIconsForApplication},
+  MX.About.Form in 'MX.About.Form.pas' {FrmAbout},
+  MX.Template.Form in 'Templates\MX.Template.Form.pas' {FrmTemplate},
+  MX.Common.Methods in 'Common\MX.Common.Methods.pas';
+
+end.
+
+
+
+
+
+
+
