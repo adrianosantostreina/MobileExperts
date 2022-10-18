@@ -74,4 +74,4 @@ Pronto. Seu projeto foi modificado e os ícones atualizados. Basta olhar em Proj
 [Português (ptBR)](https://github.com/adrianosantostreina/MobileExperts/blob/master/README-ptBR.md)<br>
 
 ## ⚠️ Licença
-`Mobile Experts` é uma biblioteca gratuita e de código aberto licenciada sob a [Licença MIT](https://github.com/adrianosantostreina/MobileExperts/blob/main/LICENSE.md).
+`Mobile Experts` é uma biblioteca gratuita e de código aberto licenciada sob a [Licença MIT](https://github.com/adrianosantostreina/MobileExperts/blob/main/LICENSE).
