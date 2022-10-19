@@ -11,6 +11,12 @@ uses
     System.Win.Registry,
   {$ENDIF MSWINDOWS}
 
+{
+  Based on https://github.com/DelphiTeacher/OrangeFreeSDK/blob/master/OrangeSDKSmartDeployment/uOrangeUISmartSDKDeployment.pas
+  from the OrangeFreeSDK project - https://github.com/DelphiTeacher/OrangeFreeSDK project
+  By Delphi Teacher - https://github.com/DelphiTeacher
+}
+
   System.SysUtils,
   System.Variants,
   XMLDoc,
